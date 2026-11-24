@@ -1,11 +1,10 @@
-# TP2 - Architectures 2-tiers et 3-tiers
-\# TP2 — Modèle client-serveur
+\# TP2 —Architectures-2-tiers-3-tiers
 
 
 
 \## Contenu
 
-\- `compte\_rendu\_tp2\_application\_cleint-serveur.pdf` : compte rendu du TP
+\- `compte\_rendu\_tp2\_architectures\2-tiers\3-tiers.pdf` : compte rendu du TP
 
 \- `index.html` : page d’accueil du serveur web
 
@@ -24,6 +23,7 @@
 
 
 Les adresses utilisées diffèrent de celles de l’énoncé. Les commandes et les tests ont été adaptés à cet adressage.
+
 
 
 
@@ -88,13 +88,16 @@ Dans le client lourd, la règle a été ajoutée en Python, dans le relevé de n
 
 ## Partie 4 — Volume de données et réseau
 
-**Mesures comparées :**
 ### Q12. Mesures comparées
 
-- **2-tiers :** le client a reçu 120 180 lignes, soit 2 407,3 Kio. Le classement a été calculé par le client (VM2) en 7 024 ms.
-- **3-tiers :** le client a reçu 1 326 octets. Le calcul a été effectué par le serveur de base de données (VM1) en 7 154 ms.
+| Mesure | 2-tiers | 3-tiers |
+|---|---:|---:|
+| Lignes reçues ou volume transféré au client | 120 180 lignes (2 407,3 Kio) | 1 326 octets |
+| Temps de calcul du classement | 7 024 ms | 7 154 ms |
+| Machine ayant effectué le calcul | Client (VM2) | Serveur de base de données (VM1) |
 
 L’écart de volume vient du fait qu’en 2-tiers le client reçoit les nombreuses lignes nécessaires au calcul, alors qu’en 3-tiers le serveur effectue le calcul et transmet principalement le résultat affiché. Avec 300 postes sur une liaison de 10 Mbit/s, ou avec un client en connexion mobile, le transfert important du 2-tiers pourrait ralentir la consultation et consommer davantage de bande passante.
+
 ### Q13. Mesure `Bytes_sent`
 
 `Bytes_sent` est un compteur cumulatif du nombre d’octets envoyés par MariaDB à ses clients. La différence entre les valeurs avant et après une requête donne le volume envoyé pendant la mesure. Cette mesure est plus directe qu’une estimation, mais une activité simultanée d’autres clients peut aussi influencer le compteur.
@@ -116,14 +119,20 @@ Après les tests, UFW a été désactivé avec `sudo ufw disable`. Le client lou
 
 ## Synthèse
 
-- **Logiciel à installer :** en 2-tiers, il faut installer le client lourd, Python et PyMySQL sur chaque poste. En 3-tiers, un navigateur suffit.
-- **Déploiement d’une nouvelle règle :** en 2-tiers, chaque client doit être mis à jour. En 3-tiers, la règle est mise à jour sur le serveur d’application.
-- **Cohérence entre utilisateurs :** en 2-tiers, les versions des clients peuvent différer. En 3-tiers, tous utilisent la même application.
-- **Trafic réseau côté client :** en 2-tiers, le client échange directement avec la base et peut recevoir beaucoup de données. En 3-tiers, il échange avec le serveur web, qui lui transmet les résultats.
-- **Exposition de la base et des mots de passe :** en 2-tiers, les clients accèdent directement à la base et peuvent avoir les identifiants. En 3-tiers, les identifiants restent sur le serveur d’application et l’accès à la base peut lui être réservé.
-- **Charge des serveurs :** en 2-tiers, davantage de traitements sont réalisés sur les clients. En 3-tiers, davantage de traitements sont réalisés sur les serveurs.
-- **Simplicité de développement :** le 2-tiers est plus simple pour une petite application. Le 3-tiers demande plus de mise en place, mais centralise l’application et facilite son évolution.
+| Critère | 2-tiers | 3-tiers |
+|---|---|---|
+| Logiciel à installer sur chaque poste | Client lourd, Python et PyMySQL | Navigateur web |
+| Déploiement d’une nouvelle règle | Mise à jour de chaque client | Mise à jour centralisée sur le serveur d’application |
+| Cohérence entre utilisateurs | Peut varier selon la version du client | Même application et mêmes règles pour tous |
+| Trafic réseau côté client | Échanges directs avec la base ; volume potentiellement élevé | Échanges avec le serveur web ; résultats calculés côté serveur |
+| Exposition du SGBD et des mots de passe | Accès direct depuis les clients ; identifiants potentiellement présents sur les postes | Accès réservé au serveur d’application ; identifiants centralisés |
+| Charge des serveurs | Davantage de traitement sur les clients | Davantage de traitement sur les serveurs |
+| Simplicité de développement | Plus simple pour une petite application | Plus complexe initialement, mais centralisée et plus facile à faire évoluer |
+
+### Q16. Quand choisir le 2-tiers ou le 3-tiers ?
+
+Le 2-tiers peut convenir à une petite application utilisée par peu de postes maîtrisés, sur un réseau de confiance, avec des données peu sensibles et peu de changements à déployer. Pour un service de scolarité utilisé par toute l’université, le 3-tiers est préférable : l’application et les règles sont centralisées, la base est moins exposée et la maintenance est facilitée.
+
 ## Conclusion
 
 Ce TP a montré qu’en 2-tiers, le client se connecte directement à la base de données. Cette architecture peut convenir à un petit environnement, mais elle expose davantage la base et complique les mises à jour. En 3-tiers, le serveur d’application centralise les échanges avec MariaDB et les clients utilisent le service web. Cette architecture facilite la maintenance et permet de limiter l’accès direct à la base ; elle convient mieux à un service utilisé à l’échelle d’une université.
-
